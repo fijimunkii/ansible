@@ -1,0 +1,32 @@
+---
+- name: Add docker apt-key
+  command: sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
+  sudo: true
+
+- name: Add docker apt-repository
+  apt_repository: repo='deb http://get.docker.io/ubuntu docker main' state=present
+  sudo: true
+
+- name: Install docker
+  apt: name=lxc-docker update_cache=yes
+  sudo: true
+
+- name: Allow sudoless docker
+  command: gpasswd -a ubuntu docker
+  sudo: true
+
+- name: Reboot server
+  command: shutdown -r now "Reboot triggered by Ansible"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  sudo: true
+
+- name: Wait for server to reboot
+  local_action:
+    module: wait_for
+      host={{ inventory_hostname }}
+      port=22
+      delay=1
+      timeout=300
+  sudo: false

@@ -1,0 +1,9 @@
+---
+- name: Create SSL Directry
+  file: dest=/home/ubuntu/ssl mode=0700 state=directory owner=root group=root
+  register: ssldir
+
+- name: Upload Unencrypted CA Cert File
+  when: ssldir|success
+  no_log: True
+  copy: content="{{ ssl_ca_crt }}" dest=/home/ubuntu/ssl/ssl.ca.crt owner=root group=root

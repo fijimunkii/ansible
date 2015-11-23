@@ -1,0 +1,10 @@
+---
+- name: Install Server Basics
+  apt: pkg={{ item }} update_cache=true
+  with_items:
+    - unattended-upgrades
+    - wget
+    - curl
+    - htop
+    - tmux
+  sudo: true

@@ -1,0 +1,6 @@
+---
+
+- name: Copy nginx files
+  copy: src=./ dest=/home/ubuntu/
+  notify:
+    - Start nginx

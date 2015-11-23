@@ -1,0 +1,24 @@
+---
+- name: Upgrade linux kernel
+  apt: pkg=linux-generic-lts-vivid install_recommends=yes update_cache=yes
+  sudo: true
+  register: kernal_upgraded
+
+- name: Reboot server
+  command: shutdown -r now "Reboot triggered by Ansible"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  sudo: true
+  when: kernal_upgraded|success
+  register: post_kernal_rebooted
+
+- name: Wait for server to reboot
+  local_action:
+    module: wait_for
+      host={{ inventory_hostname }}
+      port=22
+      delay=1
+      timeout=300
+  sudo: false
+  when: post_kernal_rebooted|success
