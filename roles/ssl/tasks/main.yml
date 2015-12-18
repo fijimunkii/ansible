@@ -1,6 +1,6 @@
 ---
 - name: Create SSL Directry
-  file: dest=/home/ubuntu/ssl mode=700 state=directory
+  file: dest=/home/ubuntu/ssl mode=0755 state=directory
   register: ssldir
 
 - name: Upload Unencrypted Key File
@@ -16,3 +16,10 @@
   copy:
     content: "{{ ssl_crt }}"
     dest: /home/ubuntu/ssl/ssl.crt
+
+- name: Upload Unencrypted CA Cert File
+  when: ssldir|success
+  no_log: True
+  copy:
+    content: "{{ ssl_ca_crt }}"
+    dest: /home/ubuntu/ssl/ssl.ca.crt
