@@ -8,3 +8,6 @@
     - htop
     - tmux
   sudo: true
+
+- name: Create logs directory
+  file: path=/home/ubuntu/logs state=directory
