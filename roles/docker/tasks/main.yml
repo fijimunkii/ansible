@@ -10,6 +10,7 @@
 - name: Install docker
   apt: name=lxc-docker update_cache=yes
   sudo: true
+  register: docker_installed
 
 - name: Allow sudoless docker
   command: gpasswd -a ubuntu docker
@@ -21,6 +22,8 @@
   poll: 0
   ignore_errors: true
   sudo: true
+  when: "'install' in docker_installed"
+  register: post_docker_reboot
 
 - name: Wait for server to reboot
   local_action:
@@ -30,6 +33,7 @@
       delay=1
       timeout=300
   sudo: false
+  when: post_docker_reboot|success
 
 - name: Install pip
   apt: name=python-pip
