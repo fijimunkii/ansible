@@ -30,3 +30,8 @@
       delay=1
       timeout=300
   sudo: false
+
+- name: Install docker-compose
+  pip:
+    name: docker-compose
+    state: present
