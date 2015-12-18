@@ -31,6 +31,10 @@
       timeout=300
   sudo: false
 
+- name: Install pip
+  apt: name=python-pip
+  sudo: true
+
 - name: Install docker-compose
   pip:
     name: docker-compose
