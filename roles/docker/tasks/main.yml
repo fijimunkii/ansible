@@ -43,3 +43,4 @@
   pip:
     name: docker-compose
     state: present
+  sudo: true
