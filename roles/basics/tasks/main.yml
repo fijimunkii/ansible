@@ -7,7 +7,12 @@
     - curl
     - htop
     - tmux
+    - python-setuptools
   sudo: true
+
+- name: Installing pip
+  easy_install:
+    name: pip
 
 - name: Create logs directory
   file: path=/home/ubuntu/logs state=directory
