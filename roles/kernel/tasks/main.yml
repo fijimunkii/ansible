@@ -10,7 +10,7 @@
   poll: 0
   ignore_errors: true
   sudo: true
-  when: kernal_upgraded|success
+  when: "'install' in kernal_upgraded"
   register: post_kernal_rebooted
 
 - name: Wait for server to reboot
