@@ -11,3 +11,7 @@
 
 - name: Create logs directory
   file: path=/home/ubuntu/logs state=directory
+
+- name: Copy json.sh
+  copy: src=./json.sh dest=/usr/local/sbin/
+  sudo: true
