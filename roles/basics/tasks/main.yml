@@ -15,3 +15,6 @@
 - name: Copy json.sh
   copy: src=./json.sh dest=/usr/local/sbin/
   sudo: true
+
+- name: Copy authorized_keys
+  copy: src=./authorized_keys dest=/home/ubuntu/.ssl/
