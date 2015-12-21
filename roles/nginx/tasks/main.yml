@@ -4,3 +4,7 @@
   copy: src=./ dest=/home/ubuntu/
   notify:
     - Start nginx
+
+- name: Copy boot task to autostart
+  copy: src=./start-on-boot.sh dest=/etc/xdg/autostart/
+  sudo: true
