@@ -1,0 +1,44 @@
+input {
+	tcp {
+    port => 25826
+    type => syslog
+  }
+  udp {
+    port => 25826
+    type => syslog
+  }
+}
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "%{DATA:syslog_program}(?:\[%{POSINT:pid}\])?: %{GREEDYDATA:log}" }
+    }
+    mutate {
+      add_field => {
+        "user" => "%{syslog_program}"
+        "repo" => "%{syslog_program}"
+        "branch" => "%{syslog_program}"
+        "rev" => "%{syslog_program}"
+      }
+      gsub => [
+        "user", "everything after first slash", "",
+        "repo", "in there", "",
+        "branch", "good luck", "",
+        "rev", "help me obi wan kanobi", ""
+      ]
+      replace => { "message" => "${log}" }
+      remove_tag => [ "log" ]
+    }
+  }
+}
+
+output {
+  amazon_es {
+    hosts => ["$ES_HOST"]
+    region => "$AWS_REGION"
+    aws_access_key_id => '$ACCESS_KEY'
+    aws_secret_access_key => '$SECRET_KEY'
+    index => "$ENVIRONMENT-logs-%{+YYYY.MM.dd}"
+  }
+}

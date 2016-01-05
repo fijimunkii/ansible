@@ -3,8 +3,31 @@
 - name: Copy nginx files
   copy: src=./ dest=/home/ubuntu/
   notify:
-    - Start nginx
+    - Restart nginx
 
 - name: Copy boot task to autostart
   copy: src=./start-on-boot.sh dest=/etc/xdg/autostart/
   sudo: true
+
+- name: Nginx container is running
+  docker:
+    name: nginx
+    image: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - "/home/ubuntu/nginx.conf:/etc/nginx/nginx.conf"
+      - "/home/ubuntu/ssl:/etc/nginx/certs"
+      - "/tmp/nginx:/etc/nginx/conf.d"
+      - "/home/ubuntu/logs:/var/log/nginx"
+    state: started
+
+- name: Nginx docker-gen container is running
+  docker:
+    name: nginx-docker-gen
+    image: jwilder/docker-gen
+    volumes_from:
+      - nginx
+    command: -notify-sighup nginx -watch -only-exposed /etc/docker-gen/templates /etc/nginx/conf.d/default.conf
+    state: started

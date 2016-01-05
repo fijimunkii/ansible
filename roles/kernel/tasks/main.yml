@@ -1,7 +1,14 @@
 ---
+- name: Is kernel upgraded?
+  shell: dpkg-query -W 'linux-generic-lts-vivid'
+  ignore_errors: true
+  changed_when: false
+  register: is_kernal_upgraded
+
 - name: Upgrade linux kernel
   apt: pkg=linux-generic-lts-vivid install_recommends=yes update_cache=yes
   sudo: true
+  when: is_kernal_upgraded|failed
   register: kernal_upgraded
 
 - name: Reboot server
@@ -10,7 +17,7 @@
   poll: 0
   ignore_errors: true
   sudo: true
-  when: "'install' in kernal_upgraded"
+  when: kernal_upgraded is defined and kernal_upgraded.stdout is defined
   register: post_kernal_rebooted
 
 - name: Wait for server to reboot
@@ -21,4 +28,4 @@
       delay=1
       timeout=300
   sudo: false
-  when: post_kernal_rebooted|success
+  when: kernal_upgraded is defined and kernal_upgraded.stdout is defined

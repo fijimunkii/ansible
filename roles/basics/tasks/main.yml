@@ -18,3 +18,17 @@
 
 - name: Copy authorized_keys
   copy: src=./authorized_keys dest=/home/ubuntu/.ssl/
+
+- name: Check if host keys have been updated
+  stat: path=/home/ubuntu/.host-keys-updated
+  register: host_keys
+
+- name: Update host keys
+  shell: ssh-keygen -A
+  sudo: true
+  when: not host_keys.stat.exists
+  register: host_keys_updated
+
+- name: Add .host-keys-updated
+  file: path=/home/ubuntu/.host-keys-updated state=touch
+  when: host_keys_updated is defined and host_keys_updated.stdout is defined

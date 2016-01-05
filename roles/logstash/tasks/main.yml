@@ -1,0 +1,32 @@
+- name: Directories are present
+  file:
+    path: "{{ item }}"
+    state: directory
+  with_items: directories
+  sudo: true
+
+- name: Config file is present
+  template:
+    src: syslog.conf.j2
+    dest: "{{ conf_dir }}/syslog.conf"
+  sudo: true
+  notify:
+    - Restart container
+
+- name: Container is running
+  docker:
+    name: logstash
+    image: topochan/logstash-es-aws
+    volumes:
+      - "{{ conf_dir }}/syslog.conf:/config-dir/logstash.tpl.conf"
+    expose:
+      - 25826
+    ports:
+      - 25826:25826
+      - 25826:25826/udp
+    env:
+      ES_HOST: "{{ es_host }}"
+      AWS_REGION: "{{ es_aws_region }}"
+      ACCESS_KEY: "{{ es_access_key }}"
+      SECRET_KEY: "{{ es_secret_key }}"
+      ENVIRONMENT: "{{ es_environment }}"

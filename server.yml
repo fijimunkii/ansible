@@ -3,6 +3,8 @@
   roles:
     - kernel
     - basics
+    - rsyslog
     - docker
     - ssl
     - nginx
+    - { role: logstash, when: logstash is defined }

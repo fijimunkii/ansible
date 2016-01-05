@@ -1,0 +1,6 @@
+---
+- name: Restart container
+  docker:
+    name: logstash
+    image: topochan/logstash-es-aws
+    state: restarted

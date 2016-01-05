@@ -1,0 +1,23 @@
+---
+- name: Packages are present
+  apt:
+    name: "{{ item }}"
+    state: latest
+    install_recommends: no
+  with_items:
+    - rsyslog
+    - logrotate
+  sudo: true
+
+- name: Config file is present
+  template:
+    src: 10-logstash.conf.j2
+    dest: /etc/rsyslog.d/10-logstash.conf
+    force: true
+  register: config_result
+  sudo: true
+
+- name: Service is restarted
+  shell: service rsyslog restart
+  when: config_result.changed
+  sudo: true

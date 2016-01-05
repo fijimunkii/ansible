@@ -1,20 +1,24 @@
 ---
-- name: Add docker apt-key
-  command: sh -c "wget -qO- https://get.docker.io/gpg | apt-key add -"
+- name: Add docker apt-repository
+  apt_repository: repo='deb http://get.docker.io/ubuntu docker main' update_cache=yes state=present
   sudo: true
 
-- name: Add docker apt-repository
-  apt_repository: repo='deb http://get.docker.io/ubuntu docker main' state=present
-  sudo: true
+- name: Is docker installed?
+  shell: dpkg-query -W 'lxc-docker'
+  ignore_errors: true
+  changed_when: false
+  register: is_docker_installed
 
 - name: Install docker
-  apt: name=lxc-docker update_cache=yes
+  apt: name=lxc-docker state=present force=true
   sudo: true
+  when: is_docker_installed|failed
   register: docker_installed
 
 - name: Allow sudoless docker
   command: gpasswd -a ubuntu docker
   sudo: true
+  when: docker_installed is defined and docker_installed.stdout is defined
 
 - name: Reboot server
   command: shutdown -r now "Reboot triggered by Ansible"
@@ -22,8 +26,8 @@
   poll: 0
   ignore_errors: true
   sudo: true
-  when: "'install' in docker_installed"
-  register: post_docker_reboot
+  when: docker_installed is defined and docker_installed.stdout is defined
+  register: post_kernal_rebooted
 
 - name: Wait for server to reboot
   local_action:
@@ -33,14 +37,37 @@
       delay=1
       timeout=300
   sudo: false
-  when: post_docker_reboot|success
+  when: docker_installed is defined and docker_installed.stdout is defined
 
 - name: Install pip
-  apt: name=python-pip
+  apt: name=python-pip state=present
   sudo: true
 
 - name: Install docker-compose
   pip:
     name: docker-compose
     state: present
+  sudo: true
+
+- name: Docker syslog
+  copy:
+    src: docker_syslog
+    dest: /etc/default/docker
+  sudo: true
+  when: elk is not defined and docker_dir is not defined
+  register: copy_result1
+
+- name: Docker syslog with dir
+  copy:
+    src: docker_syslog_dir
+    dest: /etc/default/docker
+  sudo: true
+  when: elk is not defined and docker_dir is defined
+  register: copy_result2
+
+- name: Docker service is restarted
+  shell: service docker restart
+  when: copy_result1|changed or copy_result2|changed
+  notify:
+    - Restart nginx
   sudo: true
