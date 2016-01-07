@@ -12,23 +12,29 @@ input {
 filter {
   if [type] == "syslog" {
     grok {
-      match => { "message" => "%{DATA:syslog_program}(?:\[%{POSINT:pid}\])?: %{GREEDYDATA:log}" }
+      match => { "message" => "docker\/%{DATA:syslog_program}(?:\[%{POSINT:pid}\])?: %{GREEDYDATA:log}" }
     }
     mutate {
       add_field => {
-        "user" => "%{syslog_program}"
-        "repo" => "%{syslog_program}"
+        "project" => "%{syslog_program}"
         "branch" => "%{syslog_program}"
         "rev" => "%{syslog_program}"
       }
+    }
+    mutate {
       gsub => [
-        "user", "everything after first slash", "",
-        "repo", "in there", "",
-        "branch", "good luck", "",
-        "rev", "help me obi wan kanobi", ""
+        "project", "\/.*", "",
+        "rev", ".*\/", "",
+        "branch", "^[^/]+/", ""
       ]
-      replace => { "message" => "${log}" }
-      remove_tag => [ "log" ]
+    }
+    mutate {
+      gsub => [
+        "branch", "\/.*", ""
+      ]
+    }
+    mutate {
+      remove_field => [ "message", "syslog_program" ]
     }
   }
 }
