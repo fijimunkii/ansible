@@ -1,7 +1,28 @@
 ---
+- name: Config file is present
+  template:
+    src: nginx.conf.j2
+    dest: /home/ubuntu/nginx.conf
+    force: true
+  when: proxy is not defined
+  notify:
+    - Restart nginx
 
-- name: Copy nginx files
-  copy: src=./ dest=/home/ubuntu/
+- name: Proxy config file is present
+  when: proxy
+  template:
+    src: nginx-proxy.conf.j2
+    dest: /home/ubuntu/nginx.conf
+    force: true
+  when: proxy is defined
+  notify:
+    - Restart nginx
+
+- name: Template file is present
+  template:
+    src: nginx.tmpl.j2
+    dest: /home/ubuntu/nginx.tmpl
+    force: true
   notify:
     - Restart nginx
 

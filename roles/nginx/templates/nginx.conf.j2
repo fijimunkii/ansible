@@ -48,7 +48,11 @@ http {
     ssl_certificate  /etc/nginx/certs/ssl.crt;
     ssl_certificate_key /etc/nginx/certs/ssl.key;
     ssl_client_certificate /etc/nginx/certs/ssl.ca.crt;
-    ssl_verify_client on;
+ {% if ssl_cert_required is defined %}
+   ssl_verify_client on;
+ {% elif ssl_cert_optional is defined %}
+   ssl_verify_client optional;
+ {% endif %}
     chunked_transfer_encoding on;
     return 403;
   }
