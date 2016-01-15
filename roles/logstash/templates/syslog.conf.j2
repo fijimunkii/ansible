@@ -2,39 +2,55 @@ input {
 	tcp {
     port => 25826
     type => syslog
+    ssl_enable => true
+    ssl_cert => "/config-dir/ssl.ca.crt"
+    ssl_key => "/config-dir/ssl.key"
   }
   udp {
     port => 25826
     type => syslog
+    ssl_enable => true
+    ssl_cert => "/config-dir/ssl.ca.crt"
+    ssl_key => "/config-dir/ssl.key"
   }
 }
 
 filter {
   if [type] == "syslog" {
-    grok {
-      match => { "message" => "docker\/%{DATA:syslog_program}(?:\[%{POSINT:pid}\])?: %{GREEDYDATA:log}" }
-    }
-    mutate {
-      add_field => {
-        "project" => "%{syslog_program}"
-        "branch" => "%{syslog_program}"
-        "rev" => "%{syslog_program}"
+    if "docker/app" in [message] {
+      grok {
+        match => { "message" => "docker\/app\/%{DATA:syslog_program}(?:\[%{POSINT:pid}\])?: %{GREEDYDATA:message}" }
+        overwrite => [ "message" ]
       }
-    }
-    mutate {
-      gsub => [
-        "project", "\/.*", "",
-        "rev", ".*\/", "",
-        "branch", "^[^/]+/", ""
-      ]
-    }
-    mutate {
-      gsub => [
-        "branch", "\/.*", ""
-      ]
-    }
-    mutate {
-      remove_field => [ "message", "syslog_program" ]
+      mutate {
+        add_field => {
+          "project" => "%{syslog_program}"
+          "branch" => "%{syslog_program}"
+          "rev" => "%{syslog_program}"
+        }
+      }
+      mutate {
+        gsub => [
+          "project", "\/.*", "",
+          "rev", ".*\/", "",
+          "branch", "^[^/]+/", ""
+        ]
+      }
+      mutate {
+        gsub => [
+          "branch", "\/.*", ""
+        ]
+      }
+      mutate {
+        remove_field => [ "syslog_program" ]
+      }
+
+
+    } else if "docker" in [message] {
+      grok {
+        match => { "message" => "%{SYSLOGBASE} %{DATA:message}" }
+        overwrite => [ "message" ]
+      }
     }
   }
 }
