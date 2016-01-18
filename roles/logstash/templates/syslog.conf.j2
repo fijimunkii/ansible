@@ -2,16 +2,10 @@ input {
 	tcp {
     port => 25826
     type => syslog
-    ssl_enable => true
-    ssl_cert => "/config-dir/ssl.ca.crt"
-    ssl_key => "/config-dir/ssl.key"
   }
   udp {
     port => 25826
     type => syslog
-    ssl_enable => true
-    ssl_cert => "/config-dir/ssl.ca.crt"
-    ssl_key => "/config-dir/ssl.key"
   }
 }
 

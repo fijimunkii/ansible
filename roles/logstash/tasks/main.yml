@@ -19,7 +19,6 @@
     image: topochan/logstash-es-aws
     volumes:
       - "{{ conf_dir }}/syslog.conf:/config-dir/logstash.tpl.conf"
-      - "/home/ubuntu/ssl:/config-dir"
     expose:
       - 25826
     ports:
