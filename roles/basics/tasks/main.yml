@@ -12,13 +12,7 @@
 - name: Create logs directory
   file: path=/home/ubuntu/logs state=directory
 
-- name: Copy json.sh
-  copy: src=./json.sh dest=/usr/local/sbin/
-  sudo: true
-
-- name: Copy authorized_keys
-  copy: src=./authorized_keys dest=/home/ubuntu/.ssl/
-
+# below fixes some weird error i was seeing in the logs
 - name: Check if host keys have been updated
   stat: path=/home/ubuntu/.host-keys-updated
   register: host_keys
