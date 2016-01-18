@@ -54,7 +54,7 @@
     src: docker_syslog
     dest: /etc/default/docker
   sudo: true
-  when: elk is not defined and docker_dir is not defined
+  when: logstash is not defined and docker_dir is not defined
   register: copy_result1
 
 - name: Docker syslog with dir
@@ -62,7 +62,7 @@
     src: docker_syslog_dir
     dest: /etc/default/docker
   sudo: true
-  when: elk is not defined and docker_dir is defined
+  when: logstash is not defined and docker_dir is defined
   register: copy_result2
 
 - name: Docker service is restarted
