@@ -1,6 +1,7 @@
 ---
 - hosts: all
   roles:
+    - authorized_keys
     - kernel
     - basics
     - rsyslog
