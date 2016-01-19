@@ -1,0 +1,12 @@
+---
+- name: Config directory is present
+  file: dest=/home/ubuntu/config mode=0777 state=directory
+  register: configdir
+
+- name: Config files are present
+  when: configdir|success
+  no_log: True
+  copy:
+    content: "{{ item.value }}"
+    dest: /home/ubuntu/config/{{ item.key }}
+  with_dict: "{{configs}}"

@@ -5,6 +5,7 @@
     - kernel
     - basics
     - rsyslog
+    - config
     - docker
     - ssl
     - nginx
