@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 docker stop nginx 2>/dev/null ; docker rm nginx 2>/dev/null ; \
-docker stop docker-gen 2>/dev/null ; docker rm docker-gen 2>/dev/null ; \
+docker stop nginx-docker-gen 2>/dev/null ; docker rm nginx-docker-gen 2>/dev/null ; \
 docker run -d -p 80:80 -p 443:443 --name nginx \
   -v /home/ubuntu/nginx.conf:/etc/nginx/nginx.conf \
   -v /home/ubuntu/ssl:/etc/nginx/certs \

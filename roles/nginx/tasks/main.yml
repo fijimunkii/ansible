@@ -27,7 +27,11 @@
     - Restart nginx
 
 - name: Copy boot task to autostart
-  copy: src=./start-on-boot.sh dest=/etc/xdg/autostart/
+  copy: src=./start-on-boot.sh dest=/etc/xdg/autostart/ mode=0777
+  sudo: true
+
+- name: Copy boot task to home dir
+  copy: src=./start-on-boot.sh dest=/home/ubuntu mode=0777
   sudo: true
 
 - name: Nginx container is running
@@ -48,6 +52,9 @@
   docker:
     name: nginx-docker-gen
     image: jwilder/docker-gen
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+      - "/home/ubuntu/nginx.tmpl:/etc/docker-gen/templates"
     volumes_from:
       - nginx
     command: -notify-sighup nginx -watch -only-exposed /etc/docker-gen/templates /etc/nginx/conf.d/default.conf
