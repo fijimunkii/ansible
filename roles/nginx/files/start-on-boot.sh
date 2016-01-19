@@ -8,7 +8,7 @@ docker run -d -p 80:80 -p 443:443 --name nginx \
   -v /tmp/nginx:/etc/nginx/conf.d \
   -v /home/ubuntu/logs:/var/log/nginx \
   -t nginx && \
-docker run -d --volumes-from nginx --name docker-gen \
+docker run -d --volumes-from nginx --name nginx-docker-gen \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \
   -v /home/ubuntu/nginx.tmpl:/etc/docker-gen/templates \
   -t jwilder/docker-gen -notify-sighup nginx -watch -only-exposed /etc/docker-gen/templates /etc/nginx/conf.d/default.conf
