@@ -2,6 +2,10 @@ input {
 	tcp {
     port => 25826
     type => syslog
+    codec => multiline {
+      pattern => "(index-\d at|index-\d From)"
+      what => "previous"
+    }
   }
   udp {
     port => 25826
