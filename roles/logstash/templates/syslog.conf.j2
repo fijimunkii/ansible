@@ -3,7 +3,7 @@ input {
     port => 25826
     type => syslog
     codec => multiline {
-      pattern => "(index-\d at|index-\d From)"
+      pattern => "index-\d (at|From|stack|fullref|message|ref|code|status|caller)"
       what => "previous"
     }
   }
