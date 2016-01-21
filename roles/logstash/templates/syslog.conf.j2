@@ -2,22 +2,18 @@ input {
 	tcp {
     port => 25826
     type => syslog
-    codec => multiline {
-      pattern => "index-\d (at|From|stack|fullref|message|ref|code|status|caller|{ error): "
-      what => "previous"
-    }
   }
   udp {
     port => 25826
     type => syslog
-    codec => multiline {
-      pattern => "index-\d (at|From|stack|fullref|message|ref|code|status|caller|{ error): "
-      what => "previous"
-    }
   }
 }
 
 filter {
+  multiline {
+    pattern => "index-\d (at|From|stack|fullref|message|ref|code|status|caller): "
+    what => "previous"
+  }
   if [type] == "syslog" {
     if "docker/app" in [message] {
       grok {
