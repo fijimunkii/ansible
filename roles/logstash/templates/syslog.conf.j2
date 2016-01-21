@@ -10,10 +10,6 @@ input {
 }
 
 filter {
-  multiline {
-    pattern => "index-\d (at|From|stack|fullref|message|ref|code|status|caller): "
-    what => "previous"
-  }
   if [type] == "syslog" {
     if "docker/app" in [message] {
       grok {
@@ -50,6 +46,11 @@ filter {
         overwrite => [ "message" ]
       }
     }
+  }
+  multiline {
+    pattern => "index-\d\s\s\s"
+    what => "previous"
+    stream_identity => "%{host}.%{project}.%{branch}.%{rev}"
   }
 }
 
