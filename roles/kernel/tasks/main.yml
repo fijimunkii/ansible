@@ -11,6 +11,16 @@
   when: is_kernal_upgraded|failed
   register: kernal_upgraded
 
+- name: Disable app armor (ubuntu)
+  command: /etc/init.d/apparmor stop
+  sudo: true
+  when: is_kernal_upgraded|failed
+
+- name: Disable app armor pt.2 (ubuntu)
+  command: update-rc.d -f apparmor remove
+  sudo: true
+  when: is_kernal_upgraded|failed
+
 - name: Reboot server
   command: shutdown -r now "Reboot triggered by Ansible"
   async: 0
