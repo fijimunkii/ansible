@@ -1,13 +1,3 @@
 ---
 - name: Restart nginx
-  docker:
-    name: nginx
-    image: nginx
-    state: restarted
-  notify: Restart nginx-docker-gen
-
-- name: Restart nginx-docker-gen
-  docker:
-    name: nginx-docker-gen
-    image: jwilder/docker-gen
-    state: restarted
+  command: /home/ubuntu/start-on-boot.sh

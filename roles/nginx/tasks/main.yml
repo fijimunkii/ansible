@@ -26,13 +26,11 @@
   notify:
     - Restart nginx
 
-- name: Copy boot task to autostart
-  copy: src=./start-on-boot.sh dest=/etc/xdg/autostart/ mode=0777
-  sudo: true
-
 - name: Copy boot task to home dir
   copy: src=./start-on-boot.sh dest=/home/ubuntu mode=0777
-  sudo: true
+
+- name: Cron job for boot task
+  cron: name="nginx on reboot" special_time=reboot job="/home/ubuntu/start-on-boot.sh"
 
 - name: Nginx container is running
   docker:

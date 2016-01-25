@@ -73,7 +73,7 @@
   sudo: true
 
 - name: Docker cleanup script is copied
-  copy: src=cleanup_docker.sh dest=~/.cleanup_docker.sh mode=0777
+  copy: src=cleanup_docker.sh dest=/home/ubuntu mode=0777
   register: docker_cleanup
 
 - name: Cron job for docker cleanup
