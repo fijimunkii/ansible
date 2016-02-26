@@ -4,3 +4,4 @@ directories:
   - /data
   - /data/logstash
   - "{{ conf_dir }}"
+  - /certs

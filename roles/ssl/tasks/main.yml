@@ -43,7 +43,7 @@
   no_log: True
   copy:
     content: "{{ ssl_client_cert }}"
-    dest: /home/ubuntu/ssl/ssl.client.cert
+    dest: /home/ubuntu/ssl/ssl.client.crt
 
 - name: Upload Unencrypted DH Parameters
   when: ssldir|success
