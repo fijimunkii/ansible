@@ -51,3 +51,10 @@
   copy:
     content: "{{ ssl_dh_param }}"
     dest: /home/ubuntu/ssl/dhparam.pem
+
+- name: Upload Unencrypted HTTP Basic Auth pwd.dat
+  when: ssldir|success
+  no_log: True
+  copy:
+    content: "{{ pwd_dat }}"
+    dest: /home/ubuntu/ssl/pwd.dat
