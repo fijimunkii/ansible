@@ -10,3 +10,11 @@
     content: "{{ item.value }}"
     dest: /home/ubuntu/config/{{ item.key }}
   with_dict: "{{configs}}"
+  register: configcopy
+
+- name: Config files are pretty
+  when: configcopy|success
+  no_log: True
+  command: "for file in *; do d=$(cat $file); echo $d | python -m json.tool > $file; done"
+  args:
+    chdir: /home/ubuntu/config
