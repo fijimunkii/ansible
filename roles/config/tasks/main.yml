@@ -14,7 +14,7 @@
 
 - name: Config files are pretty
   when: configcopy|success
-  no_log: True
-  command: "for file in *; do d=$(cat $file); echo $d | python -m json.tool > $file; done"
+  #no_log: True
+  command: bash -c "for file in *; do d=$(cat $file); echo $d | python -m json.tool > $file; done"
   args:
     chdir: /home/ubuntu/config
