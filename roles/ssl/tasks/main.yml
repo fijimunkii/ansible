@@ -31,6 +31,13 @@
     content: "{{ ssl_ca_key }}"
     dest: /home/ubuntu/ssl/ssl.ca.key
 
+- name: Upload Unencrypted Client Cert File
+  when: ssldir|success
+  no_log: True
+  copy:
+    content: "{{ ssl_client_crt }}"
+    dest: /home/ubuntu/ssl/ssl.client.crt
+
 - name: Upload Unencrypted Client Key File
   when: ssldir|success
   no_log: True
@@ -38,12 +45,6 @@
     content: "{{ ssl_client_key }}"
     dest: /home/ubuntu/ssl/ssl.client.key
 
-- name: Upload Unencrypted Client Cert File
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_client_cert }}"
-    dest: /home/ubuntu/ssl/ssl.client.crt
 
 - name: Upload Unencrypted DH Parameters
   when: ssldir|success
