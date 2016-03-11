@@ -1,5 +1,8 @@
 ---
-- hosts: all
+- hosts:
+    - ***REMOVED***.com
+    - ***REMOVED***.com
+    - ***REMOVED***.io
   roles:
     - authorized_keys
     - kernel
@@ -10,3 +13,4 @@
     - ssl
     - nginx
     - { role: logstash, when: logstash is defined }
+    - { role: elasticsearch, when: elasticsearch is defined }

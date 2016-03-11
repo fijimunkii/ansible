@@ -1,0 +1,25 @@
+---
+- ec2:
+    key_name: fijimunkii
+    instance_type: m3.xlarge
+    image: ami-165d6f7c
+    wait: yes
+    group:
+      - default
+      - elasticsearch
+      - https-server
+    instance_tags:
+      Name: elasticsearch
+      elasticsearch: true
+    exact_count: 2
+    count_tag: elasticsearch
+    vpc_subnet_id: subnet-965679cf
+    region: us-east-1
+    assign_public_ip: yes
+    ebs_optimized: yes
+    volumes:
+    - device_name: /dev/xvda1
+      device_type: io1
+      iops: 1000
+      volume_size: 512
+      delete_on_termination: true

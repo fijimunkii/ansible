@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+hostip=$(ip route | awk '/docker0/ { print $NF }')
 docker stop nginx 2>/dev/null ; docker rm nginx 2>/dev/null ; \
 docker stop nginx-docker-gen 2>/dev/null ; docker rm nginx-docker-gen 2>/dev/null ; \
 docker run -d -p 80:80 -p 443:443 --name nginx \
@@ -7,6 +8,7 @@ docker run -d -p 80:80 -p 443:443 --name nginx \
   -v /home/ubuntu/ssl:/etc/nginx/certs \
   -v /tmp/nginx:/etc/nginx/conf.d \
   -v /home/ubuntu/logs:/var/log/nginx \
+  --add-host dockerhost:$hostip \
   -t nginx && \
 docker run -d --volumes-from nginx --name nginx-docker-gen \
   -v /var/run/docker.sock:/tmp/docker.sock:ro \

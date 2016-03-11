@@ -9,7 +9,6 @@
     - Restart nginx
 
 - name: Proxy config file is present
-  when: proxy
   template:
     src: nginx-proxy.conf.j2
     dest: /home/ubuntu/nginx.conf
@@ -17,6 +16,16 @@
   when: proxy is defined
   notify:
     - Restart nginx
+
+- name: Elasticsearch config file is present
+  template:
+    src: nginx-elasticsearch.conf.j2
+    dest: /home/ubuntu/nginx.conf
+    force: true
+  when: elasticsearch is defined
+  notify:
+    - Restart nginx
+
 
 - name: Template file is present
   template:
@@ -32,6 +41,10 @@
 - name: Cron job for boot task
   cron: name="nginx on reboot" special_time=reboot job="/home/ubuntu/start-on-boot.sh"
 
+- name: Get the dockerhost_ip
+  command: bash -c "ip route | awk '/docker0/ { print $NF }'"
+  register: dockerhost_ip
+
 - name: Nginx container is running
   docker:
     name: nginx
@@ -39,6 +52,8 @@
     ports:
       - 80:80
       - 443:443
+    extra_hosts:
+      dockerhost: "{{dockerhost_ip.stdout}}"
     volumes:
       - "/home/ubuntu/nginx.conf:/etc/nginx/nginx.conf"
       - "/home/ubuntu/ssl:/etc/nginx/certs"

@@ -1,0 +1,6 @@
+---
+- hosts: elasticsearch
+  roles:
+    #- { role: elasticsearch-cluster, when: localAnsible is defined }
+    - { role: elasticsearch, when: localAnsible is not defined }
+    - { role: authorized_keys, when: localAnsible is not defined }
