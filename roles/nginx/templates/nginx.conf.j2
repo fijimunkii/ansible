@@ -35,7 +35,7 @@ http {
   proxy_send_timeout 6000;
   proxy_connect_timeout 30;
 
-  error_page 504 /etc/nginx/error_pages/504.html;
+  error_page 403 504 = @maintenance;
 
   gzip on;
   client_max_body_size 102400m;
@@ -48,12 +48,20 @@ http {
   server {
     listen 80;
     server_name  "";
+    location @maintenance {
+      root /etc/nginx/error_pages;
+      try_files /maintenance.html =403;
+    }
     return 403;
   }
   # return 403 for unknown hosts
   server {
     listen 443;
     server_name  "";  
+    location @maintenance {
+      root /etc/nginx/error_pages;
+      try_files /maintenance.html =403;
+    }
     ssl_certificate  /etc/nginx/certs/ssl.crt;
     ssl_certificate_key /etc/nginx/certs/ssl.key;
     ssl_client_certificate /etc/nginx/certs/ssl.ca.crt;

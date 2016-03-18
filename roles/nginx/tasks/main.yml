@@ -35,8 +35,13 @@
   notify:
     - Restart nginx
 
+- name: Create Error Pages dir
+  file: dest=/home/ubuntu/error_pages mode=0755 state=directory
+  register: errordir
+
 - name: Copy error_pages
-  copy: src=./error_pages dest=/home/ubuntu/error_pages directory_mode=true
+  copy: src=./error_pages/ dest=/home/ubuntu/error_pages/
+  when: errordir|success
 
 - name: Copy boot task
   copy: src=./start-on-boot.sh dest=/home/ubuntu mode=0777
@@ -60,6 +65,7 @@
     volumes:
       - "/home/ubuntu/nginx.conf:/etc/nginx/nginx.conf"
       - "/home/ubuntu/ssl:/etc/nginx/certs"
+      - "/home/ubuntu/error_pages:/etc/nginx/error_pages"
       - "/tmp/nginx:/etc/nginx/conf.d"
       - "/home/ubuntu/logs:/var/log/nginx"
     state: started

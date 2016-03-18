@@ -7,6 +7,7 @@
     owner={{ elasticsearch_user }}
     group={{ elasticsearch_group }}
     recurse=yes
+  sudo: true
 
 - name: post-run | Ensure Elasticsearch is running and started on boot
   service:
