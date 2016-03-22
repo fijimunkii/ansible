@@ -59,3 +59,10 @@
   copy:
     content: "{{ pwd_dat }}"
     dest: /home/ubuntu/ssl/pwd.dat
+
+- name: Upload Unenecrypted Elastic HTTP Basic Auth elasticpwd.dat
+  when: ssldir|success
+  no_log: True
+  copy:
+    content: "{{ elastic_pwd_dat }}"
+    dest: /home/ubuntu/ssl/elasticpwd.dat
