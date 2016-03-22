@@ -89,6 +89,10 @@
       proxy_set_header Connection "";
     }
 
+    location @maintenance {
+      root /etc/nginx/error_pages;
+      try_files /maintenance.html =403;
+    }
     location = /favicon.ico { log_not_found off; access_log off; }
     location = /robots.txt  { log_not_found off; access_log off; }
   }
