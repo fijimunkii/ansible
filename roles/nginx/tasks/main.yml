@@ -39,9 +39,11 @@
   file: dest=/home/ubuntu/error_pages mode=0755 state=directory
   register: errordir
 
-- name: Copy error_pages
-  copy: src=./error_pages/ dest=/home/ubuntu/error_pages/
+- name: Upload maintenance page
   when: errordir|success
+  copy: 
+    content: "{{ maintenance_html }}"
+    dest: /home/ubuntu/error_pages/maintenance.html
 
 - name: Copy boot task
   copy: src=./start-on-boot.sh dest=/home/ubuntu mode=0777
