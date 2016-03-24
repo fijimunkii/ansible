@@ -3,6 +3,7 @@
   apt: pkg={{ item }} update_cache=true
   with_items:
     - unattended-upgrades
+    - fail2ban
     - wget
     - curl
     - htop
