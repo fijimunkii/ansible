@@ -4,5 +4,5 @@
   sudo: yes
 
 - name: Restart SSH
-  command: /etc/init.d/ssh restart
+  command: service ssh restart
   sudo: yes
