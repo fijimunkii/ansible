@@ -49,9 +49,17 @@
   lineinfile: >
     dest=/etc/aliases
     line="root:hpowers@***REMOVED***.com"
-    regexp="\b{{ item }}:"
+    regexp="\broot:"
   sudo: yes
   notify: Rebuild mail aliases
 
 - name: Make logwatch mail daily
   cron: name="logwatch" minute="0" hour="0" job="/usr/sbin/logwatch --output mail --mailto hpowers@***REMOVED***.com --detail high"
+
+- name: Hide distro version from SSH
+  lineinfile: >
+    dest=/etc/ssh/sshd_config
+    line="DebianBanner no"
+    regexp="^DebianBanner"
+  sudo: yes
+  notify: Restart SSH

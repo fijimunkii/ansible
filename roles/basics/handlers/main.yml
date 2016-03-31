@@ -2,3 +2,7 @@
 - name: Rebuild mail aliases
   command: /usr/bin/newaliases
   sudo: yes
+
+- name: Restart SSH
+  command: /etc/init.d/ssh restart
+  sudo: yes
