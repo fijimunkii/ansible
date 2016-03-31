@@ -1,4 +1,11 @@
 ---
+
+- name: Set Postfix option hostname
+  debconf: name=postifx question="postfix/mailname" value="{{domain}}" vtype="string"
+
+- name: Set Postfix option type as internet site
+  debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
+
 - name: Install Server Basics
   apt: pkg={{ item }} update_cache=true
   with_items:
@@ -8,6 +15,7 @@
     - curl
     - htop
     - tmux
+    - logwatch
   sudo: true
 
 - name: Create logs directory
@@ -44,3 +52,6 @@
     regexp="\b{{ item }}:"
   sudo: yes
   notify: Rebuild mail aliases
+
+- name: Make logwatch mail daily
+  cron: name="logwatch" minute="0" hour="0" job="/usr/sbin/logwatch --output mail --mailto hpowers@***REMOVED***.com --detail high"
