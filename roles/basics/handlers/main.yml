@@ -1,0 +1,4 @@
+---
+- name: Rebuild mail aliases
+  command: /usr/bin/newaliases
+  sudo: yes

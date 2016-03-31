@@ -13,7 +13,6 @@
 - name: Create logs directory
   file: path=/home/ubuntu/logs state=directory
 
-# below fixes some weird error i was seeing in the logs
 - name: Check if host keys have been updated
   stat: path=/home/ubuntu/.host-keys-updated
   register: host_keys
@@ -27,3 +26,21 @@
 - name: Add .host-keys-updated
   file: path=/home/ubuntu/.host-keys-updated state=touch
   when: host_keys_updated is defined and host_keys_updated.stdout is defined
+
+- name: Set up user mail aliases
+  lineinfile: >
+    dest=/etc/aliases
+    line="{{ item }}: root"
+    regexp="\b{{ item }}:"
+  sudo: yes
+  with_items:
+    - ubuntu
+  notify: Rebuild mail aliases
+
+- name: Set root email
+  lineinfile: >
+    dest=/etc/aliases
+    line="root:hpowers@***REMOVED***.com"
+    regexp="\b{{ item }}:"
+  sudo: yes
+  notify: Rebuild mail aliases

@@ -77,5 +77,5 @@
   register: docker_cleanup
 
 - name: Cron job for docker cleanup
-  cron: name="check dirs" minute="0" hour="0" job="/home/ubuntu/.cleanup_docker.sh"
+  cron: name="check dirs" minute="0" hour="0" job="/home/ubuntu/.cleanup_docker.sh" user="ubuntu"
   when: docker_cleanup is defined
