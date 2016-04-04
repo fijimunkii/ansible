@@ -72,10 +72,5 @@
     - Restart nginx
   sudo: true
 
-- name: Docker cleanup script is copied
-  copy: src=cleanup_docker.sh dest=/home/ubuntu mode=0777
-  register: docker_cleanup
-
 - name: Cron job for docker cleanup
-  cron: name="check dirs" minute="0" hour="0" job="/home/ubuntu/.cleanup_docker.sh" user="ubuntu"
-  when: docker_cleanup is defined
+  cron: name="docker cleanup" minute="4" hour="20" job="docker images -q | xargs docker rmi" user="ubuntu"

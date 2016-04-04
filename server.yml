@@ -7,6 +7,7 @@
     - authorized_keys
     - kernel
     - basics
+    - harden
     - rsyslog
     #- config
     - docker

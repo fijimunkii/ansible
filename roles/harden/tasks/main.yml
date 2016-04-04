@@ -1,0 +1,107 @@
+---
+- name: Install security sotware
+  apt: pkg={{ item }} update_cache=true
+  with_item:
+    - denyhosts
+    - fail2ban
+    - logwatch
+    - psad
+    - fwsnort
+    - aide
+    - aide-common
+    - rkhunter
+    - chrootkit
+  sudo: true
+
+- name: Logwatch daily
+  cron: name="logwatch" minute="0" hour="0" job="/usr/sbin/logwatch --output mail --mailto hpowers@***REMOVED***.com --detail high"
+
+- name: Remove unnecessary users
+  user: name={{ item }} state=absent
+  with_items: ['games','gnats','irc','list','news','proxy','uucp']
+
+- name: Set shell to nologin for users
+  user: name={{ item }} shell=/usr/sbin/nologin
+  with_items: ['daemon','bin','lp','sys','man','mail','backup','nobody','libuuid']
+
+- name: Remove unnecessary groups
+  group: name={{ item }} state=absent
+  with_items: ['news','uucp','proxy','list','irc','src','gnats','games']
+
+- name: Secure shared memory - tmpfs read only
+  mount: name=/dev/shm src=tmpfs fstype=tmpfs opts=rw,nosuid,nodev,noexec state=present
+
+- name: Harden SSH
+  lineinfile: dest=/etc/ssh/sshd_config regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  with_item:
+    - { regexp: "^DebianBanner", line: "DebianBanner no" }
+    - { regexp: "^PermitRootLogin", line: "PermitRootLogin no" }
+    - { regexp: "^LoginGraceTime", line: "LoginGraceTime 20" }
+  sudo: true
+  notify: Restart SSH
+
+- name: Prevent IP spoofing
+  lineinfile: dest=/etc/host.conf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  with_items:
+    - { regexp: "^order", line: "order bind,hosts" }
+    - { regexp: "^nospoof", line: "nospoof on" }
+  sudo: true
+
+- name: Host keys | check
+  stat: path=/home/ubuntu/.host-keys-updated
+  register: host_keys
+
+- name: Host keys | update
+  shell: ssh-keygen -A
+  sudo: true
+  when: not host_keys.stat.exists
+  register: host_keys_updated
+
+- name: Host keys | post-update
+  file: path=/home/ubuntu/.host-keys-updated state=touch
+  when: host_keys_updated is defined and host_keys_updated.stdout is defined
+
+- name: psad | conf
+  template: src="psad.conf.j2" dest="/etc/psad/psad.conf" mode=0640 owner=root group=root
+  sudo: true
+  notify: Restart psad
+
+- name: psad | defaults
+  lineinfile: dest='/etc/default/psad' insertafter='EOF' line='DAEMON_ARGS="-no-rdns --no-whois"'
+  sudo: true
+
+- name: AIDE - Configure
+  lineinfile: dest=/etc/default/aide regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  with_items:
+    - { regexp: '^MAILTO', line: "MAILTO=hpowers@***REMOVED***.com" }
+    - { regexp: '^/# QUIETREPORTS|QUIETREPORTS', line: "QUIETREPORTS=yes" }
+  sudo: true
+
+- name: AIDE - Configure pt2
+  lineinfile: dest=/etc/aide/aide.conf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  with_items:
+    - { regexp: "^Checksums", line: "Checksums = 1" }
+  sudo: true
+
+- name: AIDE - Reset DB nightly
+  cron: user="root" name="Reset AIDE DB nightly" hour=23 minute=45 job="/usr/sbin/aideinit -y -f"
+  notify: Init AIDE DB
+
+- name: rkhunter | update
+  command: rkhunter --propupd
+
+- name: rkhunter | configure
+  lineinfile: dest=/etc/rkhunter.conf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
+  with_items:
+    - { regexp: "SCRIPTWHITELIST=/home/ubuntu/start-on-boot.sh", line: "SCRIPTWHITELIST=/home/ubuntu/start-on-boot.sh" }
+  sudo: true
+
+- name: rkhunter | configure cron
+  lineinfile: dest=/etc/default/rkhunter regexp="^CRON_DAILY_RUN" line='CRON_DAILY_RUN="yes"' backup=yes
+  sudo: true
+
+- name: chrootkit | cron report
+  cron: name="chkrootkit report" hour="23" minute="0" job="chkrootkit > /var/log/chkrootkit.log 2>&1" user="root"
+
+- name: chrootkit | cron logrotate
+  cron: name="chkrootkit logrotate" hour="1" minute="0" job="> /var/log/chkrootkit.log" user="root"

@@ -10,30 +10,15 @@
   apt: pkg={{ item }} update_cache=true
   with_items:
     - unattended-upgrades
-    - fail2ban
     - wget
     - curl
     - htop
     - tmux
-    - logwatch
+    - postfix
   sudo: true
 
 - name: Create logs directory
   file: path=/home/ubuntu/logs state=directory
-
-- name: Check if host keys have been updated
-  stat: path=/home/ubuntu/.host-keys-updated
-  register: host_keys
-
-- name: Update host keys
-  shell: ssh-keygen -A
-  sudo: true
-  when: not host_keys.stat.exists
-  register: host_keys_updated
-
-- name: Add .host-keys-updated
-  file: path=/home/ubuntu/.host-keys-updated state=touch
-  when: host_keys_updated is defined and host_keys_updated.stdout is defined
 
 - name: Set up user mail aliases
   lineinfile: >
@@ -52,14 +37,3 @@
     regexp="\broot:"
   sudo: yes
   notify: Rebuild mail aliases
-
-- name: Make logwatch mail daily
-  cron: name="logwatch" minute="0" hour="0" job="/usr/sbin/logwatch --output mail --mailto hpowers@***REMOVED***.com --detail high"
-
-- name: Hide distro version from SSH
-  lineinfile: >
-    dest=/etc/ssh/sshd_config
-    line="DebianBanner no"
-    regexp="^DebianBanner"
-  sudo: yes
-  notify: Restart SSH

@@ -1,0 +1,17 @@
+---
+
+- name: Restart SSH
+  command: service ssh restart
+  sudo: yes
+
+- name: Restart psad
+  service:
+    name: psad
+    state: restarted
+
+- name: Init AIDE DB
+  action: command /usr/bin/aide -c /etc/aide/aide.conf --init
+  notify: Make new AIDE DB
+
+- name: Make new AIDE DB
+  action: command /bin/cp {{ aide_new_db }} {{ aide_db }}
