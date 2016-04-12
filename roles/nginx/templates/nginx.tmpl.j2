@@ -90,6 +90,12 @@
       proxy_set_header Connection "";
     }
 
+    location /netdata {
+      auth_basic "Restricted Access";
+      auth_basic_user_file /etc/nginx/certs/pwd.dat;
+      proxy_pass http://dockerhost:19999/;
+    }
+
     location @maintenance {
       root /etc/nginx/error_pages;
       try_files /maintenance.html =403;

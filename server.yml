@@ -13,5 +13,6 @@
     - docker
     - ssl
     - nginx
+    - netdata
     - { role: logstash, when: logstash is defined }
     - { role: elasticsearch, when: elasticsearch is defined }
