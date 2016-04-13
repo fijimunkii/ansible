@@ -3,13 +3,14 @@
     - ***REMOVED***.com
     - ***REMOVED***.com
     - ***REMOVED***.io
+    - ***REMOVED***.com
   roles:
     - authorized_keys
     - kernel
     - basics
     - harden
     - rsyslog
-    #- config
+    - config
     - docker
     - ssl
     - nginx

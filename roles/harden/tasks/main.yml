@@ -1,8 +1,8 @@
 ---
 - name: Install security sotware
   apt: pkg={{ item }} update_cache=true
-  with_item:
-    - denyhosts
+  with_items:
+#    - denyhosts
     - fail2ban
     - logwatch
     - psad
@@ -10,7 +10,7 @@
     - aide
     - aide-common
     - rkhunter
-    - chrootkit
+#    - chrootkit
   sudo: true
 
 - name: Logwatch daily
@@ -19,21 +19,25 @@
 - name: Remove unnecessary users
   user: name={{ item }} state=absent
   with_items: ['games','gnats','irc','list','news','proxy','uucp']
+  sudo: true
 
 - name: Set shell to nologin for users
   user: name={{ item }} shell=/usr/sbin/nologin
   with_items: ['daemon','bin','lp','sys','man','mail','backup','nobody','libuuid']
+  sudo: true
 
 - name: Remove unnecessary groups
   group: name={{ item }} state=absent
   with_items: ['news','uucp','proxy','list','irc','src','gnats','games']
+  sudo: true
 
 - name: Secure shared memory - tmpfs read only
   mount: name=/dev/shm src=tmpfs fstype=tmpfs opts=rw,nosuid,nodev,noexec state=present
+  sudo: true
 
 - name: Harden SSH
   lineinfile: dest=/etc/ssh/sshd_config regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
-  with_item:
+  with_items:
     - { regexp: "^DebianBanner", line: "DebianBanner no" }
     - { regexp: "^PermitRootLogin", line: "PermitRootLogin no" }
     - { regexp: "^LoginGraceTime", line: "LoginGraceTime 20" }
@@ -86,9 +90,11 @@
 - name: AIDE - Reset DB nightly
   cron: user="root" name="Reset AIDE DB nightly" hour=23 minute=45 job="/usr/sbin/aideinit -y -f"
   notify: Init AIDE DB
+  sudo: true
 
 - name: rkhunter | update
   command: rkhunter --propupd
+  sudo: true
 
 - name: rkhunter | configure
   lineinfile: dest=/etc/rkhunter.conf regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
@@ -100,8 +106,8 @@
   lineinfile: dest=/etc/default/rkhunter regexp="^CRON_DAILY_RUN" line='CRON_DAILY_RUN="yes"' backup=yes
   sudo: true
 
-- name: chrootkit | cron report
-  cron: name="chkrootkit report" hour="23" minute="0" job="chkrootkit > /var/log/chkrootkit.log 2>&1" user="root"
+#- name: chrootkit | cron report
+#  cron: name="chkrootkit report" hour="23" minute="0" job="chkrootkit > /var/log/chkrootkit.log 2>&1" user="root"
 
-- name: chrootkit | cron logrotate
-  cron: name="chkrootkit logrotate" hour="1" minute="0" job="> /var/log/chkrootkit.log" user="root"
+#- name: chrootkit | cron logrotate
+#  cron: name="chkrootkit logrotate" hour="1" minute="0" job="> /var/log/chkrootkit.log" user="root"

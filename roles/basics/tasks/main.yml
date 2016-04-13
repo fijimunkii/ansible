@@ -2,13 +2,17 @@
 
 - name: Set Postfix option hostname
   debconf: name=postifx question="postfix/mailname" value="{{domain}}" vtype="string"
+  sudo: true
 
 - name: Set Postfix option type as internet site
   debconf: name=postfix question="postfix/main_mailer_type" value="'Internet Site'" vtype="string"
+  sudo: true
 
 - name: Install Server Basics
   apt: pkg={{ item }} update_cache=true
   with_items:
+    - apt-transport-https
+    - ca-certificates
     - unattended-upgrades
     - wget
     - curl
@@ -21,19 +25,13 @@
   file: path=/home/ubuntu/logs state=directory
 
 - name: Set up user mail aliases
-  lineinfile: >
-    dest=/etc/aliases
-    line="{{ item }}: root"
-    regexp="\b{{ item }}:"
-  sudo: yes
+  lineinfile: dest=/etc/aliases line="{{ item }}" regexp="^{{ item }}"
   with_items:
-    - ubuntu
+    - "ubuntu:root"
+  sudo: true
   notify: Rebuild mail aliases
 
 - name: Set root email
-  lineinfile: >
-    dest=/etc/aliases
-    line="root:hpowers@***REMOVED***.com"
-    regexp="\broot:"
-  sudo: yes
+  lineinfile: dest=/etc/aliases line="root:hpowers@***REMOVED***.com" regexp="^root:"
+  sudo: true
   notify: Rebuild mail aliases

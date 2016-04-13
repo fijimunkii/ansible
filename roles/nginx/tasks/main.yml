@@ -47,39 +47,11 @@
 
 - name: Copy boot task
   copy: src=./start-on-boot.sh dest=/home/ubuntu mode=0777
+  register: nginx_boot
 
 - name: Cron job for boot task
   cron: name="nginx on reboot" special_time=reboot job="/home/ubuntu/start-on-boot.sh"
 
-- name: Get the dockerhost_ip
-  command: bash -c "ip route | awk '/docker0/ { print $NF }'"
-  register: dockerhost_ip
-
-- name: Nginx container is running
-  docker:
-    name: nginx
-    image: nginx
-    ports:
-      - 80:80
-      - 443:443
-    extra_hosts:
-      dockerhost: "{{dockerhost_ip.stdout}}"
-    volumes:
-      - "/home/ubuntu/nginx.conf:/etc/nginx/nginx.conf"
-      - "/home/ubuntu/ssl:/etc/nginx/certs"
-      - "/home/ubuntu/error_pages:/etc/nginx/error_pages"
-      - "/tmp/nginx:/etc/nginx/conf.d"
-      - "/home/ubuntu/logs:/var/log/nginx"
-    state: started
-
-- name: Nginx docker-gen container is running
-  docker:
-    name: nginx-docker-gen
-    image: jwilder/docker-gen
-    volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
-      - "/home/ubuntu/nginx.tmpl:/etc/docker-gen/templates"
-    volumes_from:
-      - nginx
-    command: -notify-sighup nginx -watch -only-exposed /etc/docker-gen/templates /etc/nginx/conf.d/default.conf
-    state: started
+- name: Nginx and docker gen are running
+  command: /home/ubuntu/start-on-boot.sh
+  when: nginx_boot|success

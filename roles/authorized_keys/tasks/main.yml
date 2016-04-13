@@ -1,4 +1,4 @@
 ---
 - name: Authorized keys are present
   authorized_key: user=ubuntu key=https://github.com/{{ item }}.keys
-  with_items: ssh_users
+  with_items: "{{ ssh_users }}"

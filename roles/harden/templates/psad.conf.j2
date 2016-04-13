@@ -40,7 +40,7 @@ FW_SEARCH_ALL               N;
 #FW_MSG_SEARCH               Audit;
 #FW_MSG_SEARCH               REJECT;
 # FW_MSG_SEARCH               DROP;
-FW_MSG_SEARCH               {{ service_psad_config.FW_MSG_SEARCH | default("iptables-") }};
+FW_MSG_SEARCH               iptables-;
 
 ### Set the type of syslog daemon that is used.  The SYSLOG_DAEMON
 ### variable accepts four possible values: syslogd, syslog-ng, ulogd,
@@ -194,7 +194,7 @@ IGNORE_CONNTRACK_BUG_PKTS   Y;
 ## udp/1900: Simple Service Discovery Protocol (used for UPnP)
 # IGNORE_PORTS                udp/137-138, udp/17500, udp/1900;
 
-IGNORE_PORTS             {{ service_psad_config.IGNORE_PORTS | default("NONE") }};
+IGNORE_PORTS             NONE;
 
 
 ### allow entire protocols to be ignored.  This keyword can accept
@@ -209,7 +209,7 @@ IGNORE_PROTOCOLS            NONE;
 IGNORE_INTERFACES           NONE;
 
 ### Ignore these specific logging prefixes
-IGNORE_LOG_PREFIXES         {{ service_psad_config.IGNORE_LOG_PREFIXES | default("iptables-IGNORE_LOG_PREFIXES") }};
+IGNORE_LOG_PREFIXES         iptables-IGNORE_LOG_PREFIXES;
 
 ### Minimum danger level a scan must reach before any logging or
 ### alerting is done.  The EMAIL_ALERT_DANGER_LEVEL variable below
