@@ -42,7 +42,6 @@
   server {
     listen 443 ssl;
     server_name {{ $host }};
-    if ($host ~ /(\w+)\.[^.]*$/) { set $bare_host $1; }
 
     gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 

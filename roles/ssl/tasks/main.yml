@@ -3,66 +3,10 @@
   file: dest=/home/ubuntu/ssl mode=0755 state=directory
   register: ssldir
 
-- name: Upload Unencrypted Key File
+- name: Upload Unencrypted SSL Files
   when: ssldir|success
   no_log: True
   copy:
-    content: "{{ ssl_key }}"
-    dest: /home/ubuntu/ssl/ssl.key
-
-- name: Upload Unencrypted Cert File
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_crt }}"
-    dest: /home/ubuntu/ssl/ssl.crt
-
-- name: Upload Unencrypted CA Cert File
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_ca_crt }}"
-    dest: /home/ubuntu/ssl/ssl.ca.crt
-
-- name: Upload Unencrypted CA Key File
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_ca_key }}"
-    dest: /home/ubuntu/ssl/ssl.ca.key
-
-- name: Upload Unencrypted Client Cert File
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_client_crt }}"
-    dest: /home/ubuntu/ssl/ssl.client.crt
-
-- name: Upload Unencrypted Client Key File
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_client_key }}"
-    dest: /home/ubuntu/ssl/ssl.client.key
-
-
-- name: Upload Unencrypted DH Parameters
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ ssl_dh_param }}"
-    dest: /home/ubuntu/ssl/dhparam.pem
-
-- name: Upload Unencrypted HTTP Basic Auth pwd.dat
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ pwd_dat }}"
-    dest: /home/ubuntu/ssl/pwd.dat
-
-- name: Upload Unenecrypted Elastic HTTP Basic Auth elasticpwd.dat
-  when: ssldir|success
-  no_log: True
-  copy:
-    content: "{{ elastic_pwd_dat }}"
-    dest: /home/ubuntu/ssl/elasticpwd.dat
+    content: "{{ item.value }}"
+    dest: /home/ubuntu/ssl/{{ item.key }}
+  with_dict: "{{ ssl }}"
