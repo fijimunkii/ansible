@@ -1,4 +1,5 @@
 {% raw %}
+  
   {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
   upstream {{ $host }} {
 
@@ -32,70 +33,75 @@
     {{ end }}
   {{ end }}
   }
+  
+  {{ $cert := (closest (dir "/etc/nginx/certs") (printf "%s.crt" $host)) }}
+  {{ $cert := replace $cert ".crt" "" -1 }}
+  {{ $cert := replace $cert ".key" "" -1 }}
+  {{ if (and (ne $cert "") (exists (printf "/etc/nginx/certs/%s.crt" $cert)) (exists (printf "/etc/nginx/certs/%s.key" $cert)) (exists (printf "/etc/nginx/certs/%s.ca.crt" $cert))) }}
 
-  server {
-    listen 80;
-    server_name {{ $host }};
-    return 302 https://$http_host$request_uri;
-  }
+    server {
+      listen 80;
+      server_name {{ $host }};
+      return 302 https://$http_host$request_uri;
+    }
 
-  server {
-    listen 443 ssl;
-    server_name {{ $host }};
+    server {
+      listen 443 ssl;
+      server_name {{ $host }};
 
-    gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+      gzip_types text/plain text/css application/json application/x-javascript text/xml application/xml application/xml+rss text/javascript;
 
-    access_log /var/log/nginx/nginx-{{ $host }}.log;
-    error_log  /var/log/nginx/nginx-{{ $host }}-error.log error;
+      access_log /var/log/nginx/nginx-{{ $host }}.log;
+      error_log  /var/log/nginx/nginx-{{ $host }}-error.log error;
 
-    ssl_certificate  /etc/nginx/certs/$bare_host.crt;
-    ssl_certificate_key /etc/nginx/certs/$bare_host.key;
-    ssl_client_certificate /etc/nginx/certs/$bare_host.ca.crt;
+      ssl_certificate  /etc/nginx/certs/{{ (printf "%s.crt" $cert) }};
+      ssl_certificate_key /etc/nginx/certs/{{ (printf "%s.key" $cert) }};
+      ssl_client_certificate /etc/nginx/certs/{{ (printf "%s.ca.crt" $cert) }};
 {% endraw %}
  {% if ssl_cert_required is defined %}
-   ssl_verify_client on;
+     ssl_verify_client on;
  {% elif ssl_cert_optional is defined %}
-   ssl_verify_client optional;
+     ssl_verify_client optional;
  {% endif %}
-
 {% raw %}
-    ssl_session_timeout 1d;
-    ssl_session_cache shared:SSL:50m;
-    ssl_session_tickets off;
-    ssl_dhparam /etc/nginx/certs/dhparam.pem;
-    ssl_protocols TLSv1.2;
-    ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
-    ssl_prefer_server_ciphers on;
-    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+      ssl_session_timeout 1d;
+      ssl_session_cache shared:SSL:50m;
+      ssl_session_tickets off;
+      ssl_dhparam /etc/nginx/certs/dhparam.pem;
+      ssl_protocols TLSv1.2;
+      ssl_ciphers 'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256';
+      ssl_prefer_server_ciphers on;
+      add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
 
-    chunked_transfer_encoding on;
+      chunked_transfer_encoding on;
 
-    proxy_buffering off;
+      proxy_buffering off;
 
-    location / {
-      proxy_pass http://{{ $host }};
-      proxy_headers_hash_max_size 51200;
-      proxy_headers_hash_bucket_size 6400;
-      proxy_set_header X-Host $http_host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Scheme $scheme;
-      proxy_set_header X-SSL-Client-S-DN $ssl_client_s_dn;
-      proxy_set_header X-SSL-Client-Verified $ssl_client_verify;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-      proxy_set_header X-Forwarded-Proto $scheme;
-      proxy_hide_header X-Powered-By;
-      proxy_pass_header Server;
-      # HTTP 1.1 support
-      proxy_http_version 1.1;
-      proxy_set_header Connection "";
+      location / {
+        proxy_pass http://{{ $host }};
+        proxy_headers_hash_max_size 51200;
+        proxy_headers_hash_bucket_size 6400;
+        proxy_set_header X-Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Scheme $scheme;
+        proxy_set_header X-SSL-Client-S-DN $ssl_client_s_dn;
+        proxy_set_header X-SSL-Client-Verified $ssl_client_verify;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_hide_header X-Powered-By;
+        proxy_pass_header Server;
+        # HTTP 1.1 support
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+      }
+
+      location @maintenance {
+        root /etc/nginx/error_pages;
+        try_files /maintenance.html =403;
+      }
+      location = /favicon.ico { log_not_found off; access_log off; }
+      location = /robots.txt  { log_not_found off; access_log off; }
     }
-
-    location @maintenance {
-      root /etc/nginx/error_pages;
-      try_files /maintenance.html =403;
-    }
-    location = /favicon.ico { log_not_found off; access_log off; }
-    location = /robots.txt  { log_not_found off; access_log off; }
-  }
+  {{ end }}
   {{ end }}
 {% endraw %}

@@ -5,9 +5,7 @@
   sudo: yes
 
 - name: Restart psad
-  service:
-    name: psad
-    state: restarted
+  service: name=psad state=restarted
 
 - name: Init AIDE DB
   action: command /usr/bin/aide -c /etc/aide/aide.conf --init

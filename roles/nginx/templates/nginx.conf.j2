@@ -12,7 +12,6 @@ events {
 
 
 http {
-  map $http $bare_host { ~/(\w+)\.[^.]*$/ $1; }
   server_tokens off;
   add_header X-Frame-Options SAMEORIGIN;
   add_header X-Content-Type-Options nosniff;
@@ -63,9 +62,9 @@ http {
       root /etc/nginx/error_pages;
       try_files /maintenance.html =403;
     }
-    ssl_certificate  /etc/nginx/certs/$bare_host.crt;
-    ssl_certificate_key /etc/nginx/certs/$bare_host.key;
-    ssl_client_certificate /etc/nginx/certs/$bare_host.ca.crt;
+    ssl_certificate  /etc/nginx/certs/default.crt;
+    ssl_certificate_key /etc/nginx/certs/default.key;
+    ssl_client_certificate /etc/nginx/certs/default.ca.crt;
  {% if ssl_cert_required is defined %}
    ssl_verify_client on;
  {% elif ssl_cert_optional is defined %}
@@ -95,9 +94,9 @@ http {
   server {
     listen 443 ssl;
     server_name {{ inventory_hostname }};
-    ssl_certificate  /etc/nginx/certs/$bare_host.crt;
-    ssl_certificate_key /etc/nginx/certs/$bare_host.key;
-    ssl_client_certificate /etc/nginx/certs/$bare_host.ca.crt;
+    ssl_certificate  /etc/nginx/certs/default.crt;
+    ssl_certificate_key /etc/nginx/certs/default.key;
+    ssl_client_certificate /etc/nginx/certs/default.ca.crt;
     ssl_verify_client on;
     ssl_session_timeout 1d;
     ssl_session_cache shared:SSL:50m;
