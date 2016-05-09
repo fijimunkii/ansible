@@ -14,7 +14,7 @@
   sudo: true
 
 - name: Logwatch daily
-  cron: name="logwatch" minute="0" hour="0" job="/usr/sbin/logwatch --output mail --mailto hpowers@***REMOVED***.com --detail high"
+  cron: name="logwatch" minute="0" hour="0" job="/usr/sbin/logwatch --output mail --mailto harrisonpowers@gmail.com --detail high"
 
 - name: Remove unnecessary users
   user: name={{ item }} state=absent
@@ -77,7 +77,7 @@
 - name: AIDE - Configure
   lineinfile: dest=/etc/default/aide regexp="{{ item.regexp }}" line="{{ item.line }}" backup=yes
   with_items:
-    - { regexp: '^MAILTO', line: "MAILTO=hpowers@***REMOVED***.com" }
+    - { regexp: '^MAILTO', line: "MAILTO=harrisonpowers@gmail.com" }
     - { regexp: '^/# QUIETREPORTS|QUIETREPORTS', line: "QUIETREPORTS=yes" }
   sudo: true
 

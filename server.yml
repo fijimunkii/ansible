@@ -1,9 +1,6 @@
 ---
 - hosts:
-    - ***REMOVED***.com
-    - ***REMOVED***.com
-    - ***REMOVED***.io
-    - ***REMOVED***.com
+    - domain.com
   roles:
     - authorized_keys
     - kernel

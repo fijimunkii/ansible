@@ -32,6 +32,6 @@
   notify: Rebuild mail aliases
 
 - name: Set root email
-  lineinfile: dest=/etc/aliases line="root:hpowers@***REMOVED***.com" regexp="^root:"
+  lineinfile: dest=/etc/aliases line="root:harrisonpowers@gmail.com" regexp="^root:"
   sudo: true
   notify: Rebuild mail aliases

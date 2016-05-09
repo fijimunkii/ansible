@@ -4,7 +4,7 @@
 `ansible-playbook server.yml`
 
 ## To edit encrypted configs
-`ansible-vault edit group_vars/***REMOVED***.com.yml`
+`ansible-vault edit group_vars/domain.com.yml`
 
 ## To ping hosts with a local file
 
