@@ -1,0 +1,19 @@
+- name: Config file is present
+  copy:
+    content: "{{ hubot_config_json }}"
+    dest: /home/ubuntu/config.json
+
+- name: Container is running
+  docker:
+    name: hubot
+    image: fijimunkii/hubot
+    volumes:
+      - "/home/ubuntu/config.json:/usr/src/app/config.json"
+    env:
+      REDIS_URL: "redis://{{ hubot_redis_url }}/hubot"
+      HUBOT_AUTH_ADMIN: "{{ hubot_auth_admin }}"
+      HUBOT_GITHUB_ORG: "{{ hubot_github_org }}"
+      HUBOT_GITHUB_TOKEN: "{{ hubot_github_token }}"
+      HUBOT_SLACK_TOKEN: "{{ hubot_slack_token }}"
+      HUBOT_SSH_KEY: "{{ hubot_ssh_key }}"
+      HUBOT_NAME: "{{ hubot_name }}"

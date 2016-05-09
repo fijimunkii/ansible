@@ -17,3 +17,5 @@
     - netdata
     - { role: logstash, when: logstash is defined }
     - { role: elasticsearch, when: elasticsearch is defined }
+    - { role: hubot, when: hubot is defined }
+    - { role: redis, when: redis is defined }

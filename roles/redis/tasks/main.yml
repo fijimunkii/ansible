@@ -1,0 +1,9 @@
+- name: Container is running
+  docker:
+    name: redis
+    image: redis
+    command: "redis-server --appendonly yes --requirepass {{ redis_password }}"
+    volumes:
+      - "/home/ubuntu/.redis_volume:/data"
+    expose:
+      - "{{ redis_port }}"
