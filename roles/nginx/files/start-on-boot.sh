@@ -6,6 +6,7 @@ docker stop nginx-docker-gen 2>/dev/null ; docker rm nginx-docker-gen 2>/dev/nul
 docker run -d -p 80:80 -p 443:443 --name nginx \
   -v /home/ubuntu/nginx.conf:/etc/nginx/nginx.conf \
   -v /home/ubuntu/ssl:/etc/nginx/certs \
+  -v /home/ubuntu/htpasswd:/etc/nginx/htpasswd \
   -v /home/ubuntu/error_pages:/etc/nginx/error_pages \
   -v /tmp/nginx:/etc/nginx/conf.d \
   -v /home/ubuntu/logs:/var/log/nginx \

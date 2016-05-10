@@ -78,6 +78,10 @@
       proxy_buffering off;
 
       location / {
+        {{ if (exists (printf "/etc/nginx/htpasswd/%s" $host)) }}
+        auth_basic	"Restricted {{ $host }}";
+        auth_basic_user_file	{{ (printf "/etc/nginx/htpasswd/%s" $host) }};
+        {{ end }}
         proxy_pass http://{{ $host }};
         proxy_headers_hash_max_size 51200;
         proxy_headers_hash_bucket_size 6400;
