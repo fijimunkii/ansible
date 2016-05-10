@@ -18,4 +18,5 @@
       HUBOT_SLACK_TOKEN: "{{ hubot_slack_token }}"
       HUBOT_SSH_KEY: "{{ hubot_ssh_key }}"
       HUBOT_NAME: "{{ hubot_name }}"
+      VIRTUAL_HOST: "hubot.{{ group_names[0] }}"
   no_log: True
