@@ -2,6 +2,7 @@
   copy:
     content: "{{ hubot_config_json }}"
     dest: /home/ubuntu/config.json
+  no_log: True
 
 - name: Container is running
   docker:
@@ -17,3 +18,4 @@
       HUBOT_SLACK_TOKEN: "{{ hubot_slack_token }}"
       HUBOT_SSH_KEY: "{{ hubot_ssh_key }}"
       HUBOT_NAME: "{{ hubot_name }}"
+  no_log: True
