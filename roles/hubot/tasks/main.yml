@@ -4,12 +4,25 @@
     dest: /home/ubuntu/config.json
   no_log: True
 
+- name: Create hubot_certs directory
+  file: dest=/home/ubuntu/hubot_certs mode=0755 state=directory
+  register: hubotcertsdir
+
+- name: Certs are present
+  copy:
+    content: "{{ item.value }}"
+    dest: /home/ubuntu/hubot_certs/{{ item.key }}
+  with_dict: "{{ hubot_certs }}"
+  when: hubotcertsdir|success
+  no_log: True
+
 - name: Container is running
   docker:
     name: hubot
     image: fijimunkii/hubot
     volumes:
       - "/home/ubuntu/config.json:/usr/src/app/config.json"
+      - "/home/ubuntu/hubot_certs:/usr/src/app/certs"
     env:
       REDIS_URL: "redis://{{ hubot_redis_url }}/hubot"
       HUBOT_AUTH_ADMIN: "{{ hubot_auth_admin }}"

@@ -5,11 +5,11 @@
 
 - name: Upload Unencrypted SSL Files
   when: ssldir|success
-  no_log: True
   copy:
     content: "{{ item.value }}"
     dest: /home/ubuntu/ssl/{{ item.key }}
   with_dict: "{{ ssl }}"
+  no_log: True
 
 - name: Create htpasswd Directory
   file: dest=/home/ubuntu/htpasswd mode=0755 state=directory
@@ -17,9 +17,8 @@
 
 - name: Upload Unencrypted SSL Files
   when: htpasswddir|success
-  no_log: True
   copy:
     content: "{{ item.value }}"
     dest: /home/ubuntu/htpasswd/{{ item.key }}
   with_dict: "{{ htpasswd }}"
-
+  no_log: True
