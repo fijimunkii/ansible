@@ -19,4 +19,6 @@
       HUBOT_SSH_KEY: "{{ hubot_ssh_key }}"
       HUBOT_NAME: "{{ hubot_name }}"
       VIRTUAL_HOST: "hubot.{{ group_names[0] }}"
+    log_opt:
+      tag: "app/fijimunkii/hubot/master"
   no_log: True
