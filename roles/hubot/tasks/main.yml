@@ -16,6 +16,18 @@
   when: hubotcertsdir|success
   no_log: True
 
+- name: Create firefox profiles directory
+  file: dest=/home/ubuntu/firefox_profiles mode=0755 state=directory
+  register: firefoxprofilesdir
+
+- name: Firefox profiles are present
+  copy:
+    content: "{{ item.value }}"
+    dest: /home/ubuntu/firefox_profiles/{{ item.key }}
+  with_dict: "{{ firefox_profiles }}"
+  when: firefoxprofilesdir|success
+  no_log: True
+
 - name: Container is running
   docker:
     name: hubot
@@ -23,6 +35,7 @@
     volumes:
       - "/home/ubuntu/config.json:/usr/src/app/config.json"
       - "/home/ubuntu/hubot_certs:/usr/src/app/certs"
+      - "/home/ubuntu/firefox_profiles:/usr/src/app/firefox_profiles"
     env:
       REDIS_URL: "redis://{{ hubot_redis_url }}/hubot"
       HUBOT_AUTH_ADMIN: "{{ hubot_auth_admin }}"
