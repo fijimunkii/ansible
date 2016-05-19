@@ -22,8 +22,8 @@
 
 - name: Firefox profiles are present
   copy:
-    content: "{{ item.value }}"
-    dest: /home/ubuntu/firefox_profiles/{{ item.key }}
+    content: "module.exports = \"{{ item.value }}\";"
+    dest: /home/ubuntu/firefox_profiles/{{ item.key }}.js
   with_dict: "{{ firefox_profiles }}"
   when: firefoxprofilesdir|success
   no_log: True
